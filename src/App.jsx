@@ -4,13 +4,19 @@ import logoBlack from './assets/logo-black.png'
 import logoIcon from './assets/logo-icon.png'
 import mockupImg from './assets/mockup.png'
 import bgTexture from './assets/bg.png'
-import desktopPreview from './assets/desktop-preview.png'
+import desktopPreview from './assets/img.png'
 import bg from './assets/Group 2.png'
 
 import imex from './assets/imex.png'
 import bf from './assets/bf.png'
 import patoeste from './assets/patoeste.png'
 import uplay from './assets/uplay.png'
+
+import calendar from './assets/CalendarSlash.svg'
+import camera from './assets/DeviceMobileCamera.svg'
+import gps from './assets/GpsSlash.svg'
+import sidebar from './assets/Sidebar.svg'
+
 
 /* ─── Layout ──────────────────────────────────────────────────── */
 const MAX_W = '1280px'
@@ -154,10 +160,10 @@ function Hero() {
 function PainSection() {
   const [ref, visible] = useInView()
   const cards = [
-    { icon: '🪦', title: 'Design que envelhece', desc: 'Um site desatualizado sinaliza que sua empresa também está. A primeira impressão é a que fica.' },
-    { icon: '🌀', title: 'Navegação que confunde', desc: 'Se o visitante não sabe o que fazer em 8 segundos, ele vai para o concorrente.' },
-    { icon: '📉', title: 'Site sem estratégia', desc: 'Página bonita sem intenção de conversão é catálogo caro — não máquina de vendas.' },
-    { icon: '📱', title: 'Ignorando o mobile', desc: 'Mais de 80% do seu público está no celular. Um site quebrado ali custa caro todo dia.' },
+    { img: calendar, title: 'Design que envelhece', desc: 'Um site desatualizado sinaliza que sua empresa também está. A primeira impressão é a que fica.' },
+    { img: gps, title: 'Navegação que confunde', desc: 'Se o visitante não sabe o que fazer em 8 segundos, ele vai para o concorrente.' },
+    { img: sidebar, title: 'Site sem estratégia', desc: 'Página bonita sem intenção de conversão é catálogo caro — não máquina de vendas.' },
+    { img: camera, title: 'Ignorando o mobile', desc: 'Mais de 80% do seu público está no celular. Um site quebrado ali custa caro todo dia.' },
   ]
 
   return (
@@ -186,6 +192,7 @@ function PainSection() {
 
 function PainCard({ card, delay, visible }) {
   const [h, setH] = useState(false)
+  
   return (
     <div style={{
       background: '#fff', borderRadius: 14, padding: '28px 22px',
@@ -195,9 +202,22 @@ function PainCard({ card, delay, visible }) {
       opacity: visible ? 1 : 0,
       transition: `all 0.25s ease, opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
     }}
-      onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
+      onMouseEnter={() => setH(true)} 
+      onMouseLeave={() => setH(false)}
     >
-      <div style={{ fontSize: 28, marginBottom: 14 }}>{card.icon}</div>
+      {/* CORREÇÃO: Usando a tag img para renderizar o SVG e aumentar o tamanho */}
+      <div style={{ marginBottom: 16 }}>
+        <img 
+          src={card.img} 
+          alt={card.title} 
+          style={{ 
+            width: 32,      // Aumente aqui o tamanho (ex: 42, 48, 54)
+            height: 'auto', 
+            display: 'block' 
+          }} 
+        />
+      </div>
+
       <h3 style={{ fontSize: 14, fontWeight: 700, color: '#111', marginBottom: 8 }}>{card.title}</h3>
       <p style={{ fontSize: 13, color: '#777', lineHeight: 1.65 }}>{card.desc}</p>
     </div>
