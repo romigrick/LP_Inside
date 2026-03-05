@@ -34,6 +34,17 @@ function useInView(threshold = 0.15) {
   return [ref, visible]
 }
 
+function useMedia(query) {
+  const [matches, setMatches] = useState(window.matchMedia(query).matches)
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    const listener = () => setMatches(media.matches)
+    media.addEventListener('change', listener)
+    return () => media.removeEventListener('change', listener)
+  }, [query])
+  return matches
+}
+
 /* ─── Shared button ───────────────────────────────────────────── */
 function Btn({ children, variant = 'dark', href = '#contato', full = false, style: ex = {} }) {
   const [h, setH] = useState(false)
@@ -59,6 +70,8 @@ function Btn({ children, variant = 'dark', href = '#contato', full = false, styl
 /* ─── Navbar ─────────────────────────────────────────────────── */
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
+  const isMobile = useMedia('(max-width: 768px)')
+  const [menuOpen, setMenuOpen] = useState(false)
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 40)
     window.addEventListener('scroll', h)
@@ -80,12 +93,31 @@ function Navbar() {
       borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
       transition: 'all 0.35s ease',
     }}>
-      <div style={{ ...CONTAINER, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ ...CONTAINER, padding: isMobile ? '0 24px' : '0 48px', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <a href="#top"><img src={logoWhite} alt="Inside Studio" style={{ height: 28 }} /></a>
-        <div style={{ display: 'flex', gap: 30, alignItems: 'center' }}>
-          {links.map(({ label, href }) => <NavLink key={label} label={label} href={href} />)}
-          <Btn variant="outline" href="#contato">Começar projeto</Btn>
-        </div>
+        
+        {isMobile ? (
+          <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 24, cursor: 'pointer' }}>
+            {menuOpen ? '✕' : '☰'}
+          </button>
+        ) : (
+          <div style={{ display: 'flex', gap: 30, alignItems: 'center' }}>
+            {links.map(({ label, href }) => <NavLink key={label} label={label} href={href} />)}
+            <Btn variant="outline" href="#contato">Começar projeto</Btn>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      <div style={{
+        position: 'fixed', top: 70, left: 0, right: 0, height: '100vh',
+        background: '#0a0a0a', padding: '40px 24px',
+        display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center',
+        transform: isMobile && menuOpen ? 'translateX(0)' : 'translateX(100%)',
+        transition: 'transform 0.3s ease',
+      }}>
+        {links.map(({ label, href }) => <a key={label} href={href} onClick={() => setMenuOpen(false)} style={{ fontSize: 18, color: '#fff', textDecoration: 'none' }}>{label}</a>)}
+        <Btn variant="white" href="#contato" full onClick={() => setMenuOpen(false)}>Começar projeto</Btn>
       </div>
     </nav>
   )
@@ -101,38 +133,40 @@ function NavLink({ label, href }) {
 
 /* ─── 1. HERO — proposta de valor clara: quem, o quê, resultado ─ */
 function Hero() {
+  const isMobile = useMedia('(max-width: 768px)')
   return (
     <section id="top" style={{
       minHeight: '100vh',
-      background: `url(${bgTexture}) center/cover no-repeat, #0a0a0a`,
+      background: isMobile ? `url(${bg}) center/cover no-repeat, #0a0a0a` : `url(${bgTexture}) center/cover no-repeat, #0a0a0a`,
       position: 'relative', overflow: 'hidden',
     }}>
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 55% 50% at 72% 55%, rgba(59,91,252,0.1) 0%, transparent 65%)' }} />
 
       <div style={{
-        ...CONTAINER,
+        ...CONTAINER, padding: isMobile ? '0 24px' : '0 48px',
         minHeight: '100vh',
-        display: 'grid', gridTemplateColumns: '1fr 1fr',
-        alignItems: 'center', gap: 48,
-        paddingTop: 120, paddingBottom: 80,
+        display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+        alignItems: 'center', gap: isMobile ? 40 : 48,
+        textAlign: isMobile ? 'center' : 'left',
+        paddingTop: isMobile ? 20 : 100, paddingBottom: 80,
         position: 'relative', zIndex: 1,
       }}>
         <div style={{ animation: 'fadeInUp 0.9s ease both' }}>
 
           {/* Headline: quem atende + o quê faz + resultado concreto */}
-          <img src={logoWhite} alt="Inside Studio" style={{ height: 48, marginBottom: 16 }} />
+          <img src={logoWhite} alt="Inside Studio" style={{ height: 48, display: 'block', margin: isMobile ? '0 auto 16px' : '0 0 16px' }} />
           <h1 style={{ fontSize: 'clamp(34px, 3.8vw, 42px)', fontWeight: 400, lineHeight: 1.12, color: '#fff', marginBottom: 20 }}>
             Sites de alta performance<br />
             para marcas que querem<br />
             <strong style={{ fontWeight: 900 }}>vender mais no digital.</strong>
           </h1>
 
-          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.75, maxWidth: 380, marginBottom: 16 }}>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.75, maxWidth: 380, margin: isMobile ? '0 auto 16px' : '0 0 16px' }}>
             Transformamos a presença digital da sua empresa em um ativo que atrai, convence e converte — todos os dias.
           </p>
 
           {/* Micro-prova social junto ao CTA */}
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 32, letterSpacing: '0.01em' }}>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.01em', margin: isMobile ? '0 auto 32px' : '0 0 32px' }}>
             ✓ Sem compromisso &nbsp;·&nbsp; ✓ Resposta em até 24h &nbsp;·&nbsp; ✓ Proposta gratuita
           </p>
 
@@ -159,6 +193,7 @@ function Hero() {
 /* ─── 2. DOR ─────────────────────────────────────────────────── */
 function PainSection() {
   const [ref, visible] = useInView()
+  const isMobile = useMedia('(max-width: 768px)')
   const cards = [
     { img: calendar, title: 'Design que envelhece', desc: 'Um site desatualizado sinaliza que sua empresa também está. A primeira impressão é a que fica.' },
     { img: gps, title: 'Navegação que confunde', desc: 'Se o visitante não sabe o que fazer em 8 segundos, ele vai para o concorrente.' },
@@ -168,17 +203,17 @@ function PainSection() {
 
   return (
     <section id="dores" style={{ background: '#f5f5f5', padding: '96px 0', color: '#111' }} ref={ref}>
-      <div style={CONTAINER}>
+      <div style={{ ...CONTAINER, padding: isMobile ? '0 24px' : '0 48px' }}>
         <div style={{ textAlign: 'center', marginBottom: 56, opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(24px)', transition: 'all 0.6s ease' }}>
           <h2 style={{ fontSize: 'clamp(24px, 2.8vw, 36px)', fontWeight: 400, marginBottom: 14 }}>
             Por que seu site atual <strong style={{ fontWeight: 800 }}>está custando vendas?</strong>
           </h2>
-          <p style={{ fontSize: 15, color: '#666', maxWidth: 460, margin: '0 auto', lineHeight: 1.65 }}>
+          <p style={{ fontSize: 15, color: '#666', maxWidth: 480, margin: '0 auto', lineHeight: 1.65 }}>
             Esses são os 4 erros que fazem empresas como a sua perderem clientes todos os dias para concorrentes com presença digital mais forte.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, marginBottom: 52 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: 20, marginBottom: 52 }}>
           {cards.map((card, i) => <PainCard key={i} card={card} delay={i * 0.1} visible={visible} />)}
         </div>
 
@@ -227,6 +262,7 @@ function PainCard({ card, delay, visible }) {
 /* ─── 3. PROCESSO — "como resolvemos" vem antes dos serviços ──── */
 function ProcessSection() {
   const [ref, visible] = useInView()
+  const isMobile = useMedia('(max-width: 768px)')
   const steps = [
     { num: '01', title: 'Imersão', desc: 'Entendemos seu negócio, público e concorrência. Sem isso, nenhum pixel é desenhado.' },
     { num: '02', title: 'Estratégia', desc: 'Mapeamos a jornada de conversão ideal e definimos a arquitetura do site.' },
@@ -236,7 +272,7 @@ function ProcessSection() {
 
   return (
     <section id="processo" style={{ background: '#0f0f0f', padding: '96px 0', color: '#fff', borderTop: '1px solid rgba(255,255,255,0.05)' }} ref={ref}>
-      <div style={CONTAINER}>
+      <div style={{ ...CONTAINER, padding: isMobile ? '0 24px' : '0 48px' }}>
         <div style={{ textAlign: 'center', marginBottom: 64, opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)', transition: 'all 0.6s ease' }}>
           <p style={{ fontSize: 11, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.28)', marginBottom: 14, textTransform: 'uppercase' }}>Como trabalhamos</p>
           <h2 style={{ fontSize: 'clamp(24px, 2.8vw, 36px)', fontWeight: 400 }}>
@@ -244,10 +280,10 @@ function ProcessSection() {
           </h2>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', position: 'relative' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: isMobile ? 40 : 0, position: 'relative' }}>
           {/* Linha conectora */}
-          <div style={{ position: 'absolute', top: 27, left: '12.5%', right: '12.5%', height: 1, background: 'linear-gradient(to right, transparent, rgba(59,91,252,0.5), transparent)', zIndex: 0 }} />
-          {[1, 2, 3].map(i => (
+          {!isMobile && <div style={{ position: 'absolute', top: 27, left: '12.5%', right: '12.5%', height: 1, background: 'linear-gradient(to right, transparent, rgba(59,91,252,0.5), transparent)', zIndex: 0 }} />}
+          {!isMobile && [1, 2, 3].map(i => (
             <div key={i} style={{
               position: 'absolute', top: 20, left: `${i * 25}%`, transform: 'translateX(-50%)',
               width: 14, height: 14, borderRadius: '50%',
@@ -283,6 +319,7 @@ function ProcessSection() {
 function ServicesSection() {
   const [openItem, setOpenItem] = useState(0)
   const [ref, visible] = useInView()
+  const isMobile = useMedia('(max-width: 768px)')
   const services = [
     { title: 'UX/UI Design', desc: 'Interfaces bonitas e estratégicas que conduzem o visitante naturalmente até a conversão.' },
     { title: 'Performance', desc: 'Sites carregando em menos de 2s, com Core Web Vitals no verde e SEO técnico impecável.' },
@@ -292,14 +329,14 @@ function ServicesSection() {
 
   return (
     <section id="servicos" style={{ background: '#ebebeb', padding: '96px 0', color: '#111' }} ref={ref}>
-      <div style={CONTAINER}>
+      <div style={{ ...CONTAINER, padding: isMobile ? '0 24px' : '0 48px' }}>
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)', transition: 'all 0.6s ease' }}>
           <h2 style={{ fontSize: 'clamp(26px, 2.8vw, 38px)', fontWeight: 400, textAlign: 'center', marginBottom: 64, lineHeight: 1.2 }}>
             Tudo que seu site precisa para <strong style={{ fontWeight: 800 }}>converter mais.</strong>
           </h2>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, alignItems: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 48 : 72, alignItems: 'center' }}>
           <div>
             {services.map((item, i) => (
               <AccordionItem key={i} item={item} isOpen={openItem === i} onToggle={() => setOpenItem(openItem === i ? -1 : i)} />
@@ -332,6 +369,7 @@ function AccordionItem({ item, isOpen, onToggle }) {
 /* ─── 5. PORTFÓLIO + PROVA SOCIAL ────────────────────────────── */
 function PortfolioSection() {
   const [ref, visible] = useInView()
+  const isMobile = useMedia('(max-width: 768px)')
   const stats = [
     { value: '5+', label: 'Anos de experiência' },
     { value: '150+', label: 'Projetos entregues' },
@@ -350,7 +388,7 @@ function PortfolioSection() {
     }} ref={ref}>
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 45% 60% at 15% 55%, rgba(59,91,252,0.07) 0%, transparent 70%)' }} />
 
-      <div style={{ ...CONTAINER, position: 'relative', zIndex: 1 }}>
+      <div style={{ ...CONTAINER, padding: isMobile ? '0 24px' : '0 48px', position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 64, opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)', transition: 'all 0.6s ease' }}>
           <p style={{ fontSize: 11, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.28)', marginBottom: 14, textTransform: 'uppercase' }}>Portfólio selecionado</p>
@@ -360,7 +398,7 @@ function PortfolioSection() {
         </div>
 
         {/* Portfolio grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 72 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: 14, marginBottom: 72 }}>
           {projetos.map((proj, i) => (
             <PortfolioCard
               key={i}
@@ -375,7 +413,7 @@ function PortfolioSection() {
 
         {/* Stats */}
         <div style={{
-          display: 'flex', justifyContent: 'center', gap: 80, marginBottom: 80,
+          display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', gap: isMobile ? 40 : 80, marginBottom: 80,
           borderTop: '1px solid rgba(255,255,255,0.06)',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
           padding: '40px 0',
@@ -391,7 +429,7 @@ function PortfolioSection() {
         {/* Testimonials — prova social real */}
         <div style={{ marginBottom: 16 }}>
           <p style={{ textAlign: 'center', fontSize: 11, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.28)', marginBottom: 36, textTransform: 'uppercase' }}>O que nossos clientes dizem</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 20 }}>
             {testimonials.map((t, i) => <TestimonialCard key={i} t={t} visible={visible} delay={i * 0.12} />)}
           </div>
         </div>
@@ -580,6 +618,7 @@ function WhatsAppPopup({ name, challenge, onClose }) {
 /* ─── 6. CONTATO ─────────────────────────────────────────────── */
 function ContactSection() {
   const [ref, visible] = useInView()
+  const isMobile = useMedia('(max-width: 768px)')
   const [challenge, setChallenge] = useState(null)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -647,8 +686,8 @@ function ContactSection() {
       )}
 
       <section id="contato" style={{ background: '#f5f5f5', padding: '96px 0', color: '#111' }} ref={ref}>
-        <div style={CONTAINER}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
+        <div style={{ ...CONTAINER, padding: isMobile ? '0 24px' : '0 48px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 48 : 80, alignItems: 'center' }}>
 
             {/* Left */}
 
@@ -797,9 +836,10 @@ function SubmitBtn({ disabled, loading }) {
 
 /* ─── Footer ─────────────────────────────────────────────────── */
 function Footer() {
+  const isMobile = useMedia('(max-width: 768px)')
   return (
     <footer style={{ background: '#f5f5f5', borderTop: '1px solid rgba(0,0,0,0.08)', padding: '24px 0' }}>
-      <div style={{ ...CONTAINER, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ ...CONTAINER, padding: isMobile ? '0 24px' : '0 48px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 20 : 0, alignItems: 'center', justifyContent: 'space-between' }}>
         <a href="https://insidestudio.com.br" target="_blank">
           <img src={logoWhite} alt="Inside Studio" style={{ height: 22, filter: 'brightness(0)', opacity: 0.28 }} />
         </a>
