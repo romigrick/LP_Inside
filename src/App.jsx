@@ -376,9 +376,9 @@ function PortfolioSection() {
     { value: '100%', label: 'Clientes satisfeitos' },
   ]
   const testimonials = [
-    { text: 'Triplicamos os leads qualificados em 60 dias após o lançamento. O ROI foi absurdo.', name: 'Marcos Andrade', role: 'CEO · Andrade Energia' },
-    { text: 'Finalmente um site que parece nossa empresa de verdade. Nossos clientes perceberam na hora.', name: 'Camila Rocha', role: 'Diretora · Studio CR' },
-    { text: 'A Inside entregou no prazo, dentro do orçamento e acima das expectativas. Raro hoje.', name: 'Rafael Torres', role: 'Fundador · Patoeste' },
+    { text: 'Triplicamos os leads qualificados em 60 dias após o lançamento. O ROI foi absurdo.', name: 'Pedro Passos', role: 'CEO - PHPF Negócios' },
+    { text: 'Finalmente um site que parece nossa empresa de verdade. Nossos clientes perceberam na hora.', name: 'Milton Nascimento', role: 'Diretor - BF Energia' },
+    { text: 'A Inside entregou no prazo, dentro do orçamento e acima das expectativas. Raro hoje.', name: 'Felipe Vaz', role: 'CEO - Shark Smart' },
   ]
 
   return (
