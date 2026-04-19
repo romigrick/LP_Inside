@@ -500,11 +500,11 @@ function TestimonialCard({ t, visible, delay }) {
 }
 
 /* ─── EmailJS config ─────────────────────────────────────────── */
-const EMAILJS_SERVICE_ID = 'service_phqmznv'
-const EMAILJS_TEMPLATE_ID = 'template_a26d45n'
-const EMAILJS_REPLY_ID = 'template_426xx6q'
-const EMAILJS_PUBLIC_KEY = '0sABaEPF59PqSVtsU'
-const WA_NUMBER = '5542998141401'
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID 
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID 
+const EMAILJS_REPLY_ID = import.meta.env.VITE_EMAILJS_REPLY_ID 
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY 
+const WA_NUMBER = import.meta.env.VITE_WA_NUMBER
 
 /* ─── WhatsApp Popup ─────────────────────────────────────────── */
 function WhatsAppPopup({ name, challenge, onClose }) {
